@@ -20,6 +20,13 @@
 # production
 /build
 
+# python / django
+BackEnd/venv/
+BackEnd/**/__pycache__/
+BackEnd/**/*.pyc
+BackEnd/.env
+BackEnd/venv/.env
+
 # misc
 .DS_Store
 *.pem
