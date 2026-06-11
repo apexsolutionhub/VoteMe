@@ -107,6 +107,17 @@ export default function HomePage() {
         </div>
 
         <div className="mt-12 flex flex-col items-center gap-4">
+          <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground/70">
+            <Link href="/privacy" className="hover:text-violet-300 hover:underline">
+              Privacy Policy
+            </Link>
+            <span aria-hidden className="text-muted-foreground/40">
+              ·
+            </span>
+            <Link href="/terms" className="hover:text-violet-300 hover:underline">
+              Terms of Service
+            </Link>
+          </nav>
           <p className="text-xs text-muted-foreground/50">
             © {new Date().getFullYear()} voteMe. All rights reserved.
           </p>
