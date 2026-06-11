@@ -1,5 +1,19 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Git (two repos, one folder)
+
+Same layout as `hotcol-user`: `BackEnd/` has its own `.git` and pushes to the backend repo; the root repo pushes the full project (including `BackEnd` as a linked folder).
+
+| Where | Remote | Repo |
+|-------|--------|------|
+| Repo root | `frontend` | [VoteMe](https://github.com/apexsolutionhub/VoteMe) |
+| `BackEnd/` | `origin` | [VoteMe-BackEnd](https://github.com/apexsolutionhub/VoteMe-BackEnd) |
+
+**Push frontend (everything):** from repo root → `git push frontend main`  
+**Push backend only:** from `BackEnd/` → `git push origin main`
+
+See `BackEnd/README.md` for first-time nested-repo setup.
+
 ## Getting Started
 
 First, run the development server:
