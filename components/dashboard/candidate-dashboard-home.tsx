@@ -60,7 +60,6 @@ export function CandidateDashboardHome() {
 
   useEffect(() => {
     let active = true;
-    let interval: ReturnType<typeof setInterval> | undefined;
 
     async function load() {
       try {
@@ -72,11 +71,11 @@ export function CandidateDashboardHome() {
     }
 
     load();
-    interval = setInterval(load, 60_000);
+    const interval = setInterval(load, 60_000);
 
     return () => {
       active = false;
-      if (interval) clearInterval(interval);
+      clearInterval(interval);
     };
   }, []);
 

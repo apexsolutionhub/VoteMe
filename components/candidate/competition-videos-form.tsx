@@ -40,7 +40,10 @@ export function CompetitionVideosForm() {
       const [videoList, org, tiktok] = await Promise.all([
         fetchCandidateVideos(),
         fetchOrganizationMe(),
-        fetchTikTokStatus().catch(() => ({ connected: false })),
+        fetchTikTokStatus().catch(() => ({
+          connected: false,
+          configured: false,
+        })),
       ]);
       setVideos(videoList);
       setTiktokConnected(tiktok.connected);

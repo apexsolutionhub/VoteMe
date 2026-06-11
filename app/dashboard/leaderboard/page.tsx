@@ -34,7 +34,6 @@ export default function AdminLeaderboardPage() {
     if (!isAdmin) return;
 
     let active = true;
-    let interval: ReturnType<typeof setInterval> | undefined;
 
     async function load() {
       try {
@@ -61,11 +60,11 @@ export default function AdminLeaderboardPage() {
     }
 
     load();
-    interval = setInterval(load, 60_000);
+    const interval = setInterval(load, 60_000);
 
     return () => {
       active = false;
-      if (interval) clearInterval(interval);
+      clearInterval(interval);
     };
   }, [isAdmin]);
 

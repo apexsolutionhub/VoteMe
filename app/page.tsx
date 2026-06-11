@@ -74,7 +74,7 @@ export default function HomePage() {
             <Link
               key={portal.href}
               href={portal.href}
-              className={`group relative flex flex-col overflow-hidden rounded-3xl border bg-white/[0.04] p-7 backdrop-blur-2xl transition-all duration-500 hover:-translate-y-1 hover:bg-white/[0.06] hover:shadow-2xl ${portal.border} ${portal.glow}`}
+              className={`group relative flex flex-col overflow-hidden rounded-3xl border bg-white/4 p-7 backdrop-blur-2xl transition-all duration-500 hover:-translate-y-1 hover:bg-white/[0.06] hover:shadow-2xl ${portal.border} ${portal.glow}`}
             >
               <div
                 aria-hidden
