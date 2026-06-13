@@ -74,7 +74,7 @@ export default function HomePage() {
             <Link
               key={portal.href}
               href={portal.href}
-              className={`group relative flex flex-col overflow-hidden rounded-3xl border bg-white/4 p-7 backdrop-blur-2xl transition-all duration-500 hover:-translate-y-1 hover:bg-white/[0.06] hover:shadow-2xl ${portal.border} ${portal.glow}`}
+              className={`group relative flex flex-col overflow-hidden rounded-3xl border bg-white/4 p-7 backdrop-blur-2xl transition-all duration-500 hover:-translate-y-1 hover:bg-white/6 hover:shadow-2xl ${portal.border} ${portal.glow}`}
             >
               <div
                 aria-hidden
@@ -107,6 +107,13 @@ export default function HomePage() {
         </div>
 
         <div className="mt-12 flex flex-col items-center gap-4">
+          <Link
+            href="/signup"
+            className="inline-flex items-center gap-2 rounded-full border border-amber-400/25 bg-amber-500/10 px-5 py-2.5 text-sm font-medium text-amber-100 transition-colors hover:border-amber-400/40 hover:bg-amber-500/15"
+          >
+            Start your competition
+            <ArrowRight className="size-4" />
+          </Link>
           <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground/70">
             <Link href="/privacy" className="hover:text-violet-300 hover:underline">
               Privacy Policy

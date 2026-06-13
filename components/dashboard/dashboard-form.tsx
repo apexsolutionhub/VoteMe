@@ -12,11 +12,12 @@ export function DashboardForm({ className, ...props }: ComponentProps<"form">) {
 type DashboardFormRowProps = {
   children: ReactNode;
   className?: string;
-  columns?: 2 | 3 | 4;
+  columns?: 1 | 2 | 3 | 4;
 };
 
 const columnClasses: Record<NonNullable<DashboardFormRowProps["columns"]>, string> =
   {
+    1: "grid-cols-1",
     2: "sm:grid-cols-2",
     3: "sm:grid-cols-2 lg:grid-cols-3",
     4: "sm:grid-cols-2 lg:grid-cols-4",

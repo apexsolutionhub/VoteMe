@@ -8,6 +8,7 @@ import {
   RefreshCw,
   Settings2,
   ShieldCheck,
+  Share2,
   Trophy,
   UserPlus,
   Users,
@@ -20,7 +21,9 @@ import { DashboardSection } from "@/components/dashboard/dashboard-section";
 import { PasswordSetupOverviewSection } from "@/components/dashboard/password-setup-panel";
 import { QuickActionCard } from "@/components/dashboard/quick-action-card";
 import { StatCard } from "@/components/dashboard/stat-card";
+import { CompetitionStandingsPanel } from "@/components/admin/competition-standings-panel";
 import { GlassCard } from "@/components/dashboard/glass-card";
+import { ADMIN_LEADERBOARD_PATH } from "@/components/dashboard/dashboard-nav";
 import { useDashboardUser } from "@/components/dashboard/dashboard-user-context";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -64,8 +67,12 @@ export function AdminDashboardHome() {
     setSyncing(true);
     try {
       const result = await syncCompetition();
-      toast.success(`Synced ${result.synced_count} videos`);
-      await loadData();
+      if (result.sync_warning) {
+        toast.warning(result.sync_warning);
+      } else {
+        toast.success(`Synced ${result.synced_count} videos`);
+      }
+      void loadData();
     } catch (error) {
       toast.error(getApiErrorMessage(error));
     } finally {
@@ -81,6 +88,11 @@ export function AdminDashboardHome() {
       incomplete,
     };
   }, [candidates]);
+
+  const publicLeaderboardHref =
+    competition?.status === "ended" && user.organization?.slug
+      ? `/o/${user.organization.slug}/leaderboard`
+      : null;
 
 
   return (
@@ -121,6 +133,8 @@ export function AdminDashboardHome() {
           />
         </div>
         </DashboardSection>
+
+        <CompetitionStandingsPanel compact />
 
         <GlassCard
           accent="amber"
@@ -178,12 +192,38 @@ export function AdminDashboardHome() {
                   Settings
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="sm" className="border-white/10">
-                  <Link href="/dashboard/leaderboard">
+              <Button
+                asChild={competition?.status === "ended"}
+                variant="outline"
+                size="sm"
+                className="border-white/10"
+                disabled={!competition || competition.status !== "ended"}
+              >
+                {competition?.status === "ended" ? (
+                  <Link href={ADMIN_LEADERBOARD_PATH}>
                     <ExternalLink className="size-4" />
                     Leaderboard
                   </Link>
+                ) : (
+                  <>
+                    <ExternalLink className="size-4" />
+                    Leaderboard
+                  </>
+                )}
+              </Button>
+              {publicLeaderboardHref ? (
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="border-white/10"
+                >
+                  <Link href={publicLeaderboardHref} target="_blank" rel="noopener noreferrer">
+                    <Share2 className="size-4" />
+                    Public link
+                  </Link>
                 </Button>
+              ) : null}
             </div>
           </div>
         </GlassCard>
@@ -215,9 +255,13 @@ export function AdminDashboardHome() {
               accent="sky"
             />
             <QuickActionCard
-              href="/dashboard/leaderboard"
+              href={competition?.status === "ended" ? ADMIN_LEADERBOARD_PATH : "/dashboard/competition"}
               title="Leaderboard"
-              description="Admin-only live rankings and engagement scores"
+              description={
+                competition?.status === "ended"
+                  ? "Winner reveal ceremony and top-three podium"
+                  : "Unlocks when the competition ends"
+              }
               icon={Trophy}
               accent="violet"
             />

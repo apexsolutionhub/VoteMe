@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Privacy Policy — voteMe",
-  description: "How voteMe collects and uses data, including TikTok OAuth.",
+  description: "How voteMe collects and uses data for TikTok engagement competitions.",
 };
 
 export default function PrivacyPage() {
@@ -32,10 +32,6 @@ export default function PrivacyPage() {
             <li>Account details you provide (name, email, phone, profile information).</li>
             <li>Organization and competition data entered by admins.</li>
             <li>TikTok video URLs and public engagement metrics (views, likes, comments).</li>
-            <li>
-              If you connect TikTok via Login Kit: OAuth tokens and basic profile identifiers
-              needed to sync your videos. We do not post on your behalf.
-            </li>
           </ul>
         </section>
 
@@ -52,10 +48,9 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-lg font-medium text-foreground">TikTok data</h2>
           <p className="mt-3">
-            When you authorize voteMe through TikTok, we receive access tokens and
-            permitted API data according to the scopes you approve (such as basic profile
-            information and video metrics). You may disconnect TikTok at any time from
-            your dashboard, which removes stored tokens for your account.
+            When you submit TikTok video URLs, we sync public engagement metrics
+            (views, likes, comments) for competition tracking. We do not post on
+            your behalf or access your TikTok account.
           </p>
         </section>
 
@@ -72,8 +67,7 @@ export default function PrivacyPage() {
           <h2 className="text-lg font-medium text-foreground">Security & retention</h2>
           <p className="mt-3">
             We use industry-standard measures to protect data in transit and at rest.
-            OAuth tokens are stored on our backend servers, not in the browser. We retain
-            data while your account is active and as needed to operate competitions.
+            We retain data while your account is active and as needed to operate competitions.
           </p>
         </section>
 

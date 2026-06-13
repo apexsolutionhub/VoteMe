@@ -1,50 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# voteMe
 
-## Git (two repos, one folder)
+Multi-tenant TikTok engagement competition platform — admin dashboards, candidate portals, live metric sync, dynamic scoring criteria, and a cinematic winner reveal ceremony.
 
-Same layout as `hotcol-user`: `BackEnd/` has its own `.git` and pushes to the backend repo; the root repo pushes the full project (including `BackEnd` as a linked folder).
+## Stack
 
-| Where | Remote | Repo |
-|-------|--------|------|
-| Repo root | `frontend` | [VoteMe](https://github.com/apexsolutionhub/VoteMe) |
-| `BackEnd/` | `origin` | [VoteMe-BackEnd](https://github.com/apexsolutionhub/VoteMe-BackEnd) |
+| Layer | Technology |
+|-------|------------|
+| Frontend | Next.js 16, React 19, Tailwind 4, shadcn/ui |
+| Backend | Django 5 + DRF, JWT, MySQL |
+| Media | Cloudinary |
+| Metrics | TikTok public URL scraping (no OAuth) |
 
-**Push frontend (everything):** from repo root → `git push frontend main`  
-**Push backend only:** from `BackEnd/` → `git push origin main`
+## Repos (nested)
 
-See `BackEnd/README.md` for first-time nested-repo setup.
+| Path | Remote | Contents |
+|------|--------|----------|
+| Repo root | `frontend` → [VoteMe](https://github.com/apexsolutionhub/VoteMe) | Full project |
+| `BackEnd/` | `origin` → [VoteMe-BackEnd](https://github.com/apexsolutionhub/VoteMe-BackEnd) | Django API only |
 
-## Getting Started
+See `BackEnd/README.md` for nested-repo setup.
 
-First, run the development server:
+## Quick start
+
+### Backend
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd BackEnd
+python -m venv venv
+.\venv\Scripts\activate          # Windows
+pip install -r requirements.txt
+# Copy BackEnd/.env.example → BackEnd/venv/.env and fill DB_* vars
+python manage.py migrate
+python manage.py seed_admin      # demo: ellaVote / 12345678
+python manage.py runserver
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Frontend
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+# Optional: .env.local with BACKEND_URL=http://127.0.0.1:8000
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open [http://localhost:3000](http://localhost:3000).
 
-## Learn More
+## Key routes
 
-To learn more about Next.js, take a look at the following resources:
+| Route | Who | Purpose |
+|-------|-----|---------|
+| `/Admin` | Admins | Login |
+| `/Candidates` | Candidates | Login |
+| `/signup` | New orgs | Create workspace (invite code required) |
+| `/dashboard/*` | Authenticated | Admin or candidate portal |
+| `/o/[slug]/leaderboard` | Public | Results ceremony (after competition ends) |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Engagement sync (cron)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Schedule periodic sync for live competitions:
 
-## Deploy on Vercel
+```bash
+cd BackEnd
+python manage.py sync_engagement
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Recommended: every 5–10 minutes via system cron or cloud scheduler while competitions are live.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Environment
+
+**Backend** (`BackEnd/venv/.env`): `DB_*`, `SECRET_KEY`, `CORS_ALLOWED_ORIGINS`, `SIGNUP_SECRET_CODE`, optional `BRAND_MENTION_KEYWORD`.
+
+**Frontend** (`.env.local`): `BACKEND_URL`, `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `NEXT_PUBLIC_CLOUDINARY_PRESET_NAME`.
+
+## Scripts
+
+```bash
+npm run dev      # Next.js dev server
+npm run build    # Production build + typecheck
+npm run lint     # ESLint
+```
+
+**Backend tests** (SQLite, no MySQL required):
+
+```bash
+cd BackEnd
+USE_SQLITE_TEST=true python manage.py test competitions.tests
+```
+
+## Features
+
+- Org-scoped JWT auth with admin / candidate roles
+- Competition lifecycle: draft → live → ended
+- Video eligibility by TikTok publish window
+- Dynamic milestones + scoring metrics
+- Optional matched-comment scoring with admin approximation warning
+- Admin leaderboard ceremony + public shareable results URL
+- Candidate analytics, achievements, and post-competition rank cards
+
+## Deploy notes
+
+- Frontend: Vercel (or any Node host) with `BACKEND_URL` pointing at your Django API
+- Backend: any WSGI host with MySQL + env vars; run migrations and schedule `sync_engagement`
+- Set `SIGNUP_SECRET_CODE` before enabling `/signup` for new clients

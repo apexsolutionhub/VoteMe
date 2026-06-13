@@ -29,8 +29,9 @@ export default function ProfilePage() {
   return (
     <>
       <DashboardPageHeader
+        eyebrow="Candidate"
         title="Profile,"
-        description="Complete your candidate profile with contact details, channel link, and photo."
+        description="Build your competition identity — every field updates the live preview instantly."
       />
       <CandidateProfileForm />
     </>

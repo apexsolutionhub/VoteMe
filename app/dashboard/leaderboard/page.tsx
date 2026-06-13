@@ -1,9 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
-import { CandidateShowcase } from "@/components/candidates/candidate-showcase";
-import { DashboardPageHeader } from "@/components/dashboard/dashboard-page-header";
+import {
+  LeaderboardCeremony,
+  LeaderboardUnavailable,
+  type ShowcaseCandidate,
+} from "@/components/candidates/leaderboard-ceremony";
 import { Spinner } from "@/components/ui/spinner";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
 import {
@@ -17,56 +22,41 @@ export default function AdminLeaderboardPage() {
   const [title, setTitle] = useState("Social Media Engagement Competition");
   const [organizationName, setOrganizationName] = useState("");
   const [organizationLogoUrl, setOrganizationLogoUrl] = useState("");
-  const [candidates, setCandidates] = useState<
-    Array<{
-      id: string;
-      name: string;
-      handle: string;
-      initials: string;
-      views: number;
-      likes: number;
-      comments: number;
-      engagementScore: number;
-    }>
-  >([]);
+  const [competitionStatus, setCompetitionStatus] = useState("draft");
+  const [leaderboardAvailable, setLeaderboardAvailable] = useState(false);
+  const [candidates, setCandidates] = useState<ShowcaseCandidate[]>([]);
+
+  const loadLeaderboard = useCallback(async () => {
+    try {
+      const data = await fetchAdminLeaderboard();
+      setTitle(data.competition.title);
+      setOrganizationName(data.organization.name);
+      setOrganizationLogoUrl(data.organization.logo_url ?? "");
+      setCompetitionStatus(data.competition.status);
+      setLeaderboardAvailable(data.leaderboard_available);
+      setCandidates(
+        data.leaderboard.map((entry: LeaderboardEntry) => ({
+          id: String(entry.candidate_id),
+          name: entry.name,
+          handle: entry.username,
+          initials: entry.initials,
+          profileImageUrl: entry.profile_image_url || undefined,
+          views: entry.views,
+          likes: entry.likes,
+          comments: entry.comments,
+          engagementScore: entry.engagement_score,
+          rank: entry.rank,
+        })),
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (!isAdmin) return;
-
-    let active = true;
-
-    async function load() {
-      try {
-        const data = await fetchAdminLeaderboard();
-        if (!active) return;
-        setTitle(data.competition.title);
-        setOrganizationName(data.organization.name);
-        setOrganizationLogoUrl(data.organization.logo_url ?? "");
-        setCandidates(
-          data.leaderboard.map((entry: LeaderboardEntry) => ({
-            id: String(entry.candidate_id),
-            name: entry.name,
-            handle: entry.username,
-            initials: entry.initials,
-            views: entry.views,
-            likes: entry.likes,
-            comments: entry.comments,
-            engagementScore: entry.engagement_score,
-          })),
-        );
-      } finally {
-        if (active) setLoading(false);
-      }
-    }
-
-    load();
-    const interval = setInterval(load, 60_000);
-
-    return () => {
-      active = false;
-      clearInterval(interval);
-    };
-  }, [isAdmin]);
+    void loadLeaderboard();
+  }, [isAdmin, loadLeaderboard]);
 
   if (!isAdmin) {
     return null;
@@ -74,28 +64,45 @@ export default function AdminLeaderboardPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
+      <div className="flex min-h-svh items-center justify-center bg-background">
         <Spinner className="size-8" />
       </div>
     );
   }
 
-  return (
-    <div className="space-y-6">
-      <DashboardPageHeader
-        eyebrow="Admin"
-        title="Leaderboard"
-        description="Live candidate rankings with engagement scores. Only visible to admins."
-      />
-      <div className="-mx-4 overflow-hidden rounded-2xl border border-white/8 sm:-mx-6 lg:-mx-8">
-        <CandidateShowcase
-          candidates={candidates}
+  if (!leaderboardAvailable) {
+    return (
+      <div className="relative min-h-svh">
+        <Link
+          href="/dashboard"
+          className="fixed left-4 top-4 z-50 inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-black/40 px-3 py-1.5 text-xs font-medium text-white/80 backdrop-blur-md transition-colors hover:bg-black/55 hover:text-white sm:left-6 sm:top-6"
+        >
+          <ArrowLeft className="size-3.5" />
+          Dashboard
+        </Link>
+        <LeaderboardUnavailable
+          competitionStatus={competitionStatus}
           competitionTitle={title}
-          organizationName={organizationName}
-          organizationLogoUrl={organizationLogoUrl}
-          showEngagementScore
         />
       </div>
+    );
+  }
+
+  return (
+    <div className="relative min-h-svh">
+      <Link
+        href="/dashboard"
+        className="fixed left-4 top-4 z-50 inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-black/40 px-3 py-1.5 text-xs font-medium text-white/80 backdrop-blur-md transition-colors hover:bg-black/55 hover:text-white sm:left-6 sm:top-6"
+      >
+        <ArrowLeft className="size-3.5" />
+        Dashboard
+      </Link>
+      <LeaderboardCeremony
+        candidates={candidates}
+        competitionTitle={title}
+        organizationName={organizationName}
+        organizationLogoUrl={organizationLogoUrl}
+      />
     </div>
   );
 }

@@ -45,11 +45,10 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-medium text-foreground">TikTok connection</h2>
+          <h2 className="text-lg font-medium text-foreground">TikTok videos</h2>
           <p className="mt-3">
-            Connecting a TikTok account is optional but may be required to sync certain
-            metrics. You grant voteMe permission to access TikTok data only for the
-            scopes you approve during OAuth. You may disconnect at any time.
+            Candidates submit TikTok video URLs for the competition. Public views,
+            likes, and comments are synced automatically for leaderboard tracking.
           </p>
         </section>
 

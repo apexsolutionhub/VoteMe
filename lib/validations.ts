@@ -1,6 +1,8 @@
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { z } from "zod";
 
+import { normalizeVideoUrl } from "@/lib/video-url";
+
 const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 export const loginValidation = z.object({
@@ -90,13 +92,17 @@ export const candidateProfileValidation = z.object({
 });
 
 export const competitionVideoValidation = z.object({
-  url: z.string().url("Enter a valid video URL"),
+  url: z
+    .string()
+    .min(1, "Video URL is required")
+    .transform((value) => normalizeVideoUrl(value))
+    .pipe(z.string().url("Enter a valid video URL")),
 });
 
 export const competitionSettingsValidation = z.object({
   title: z.string().min(2, "Title is required"),
   description: z.string().optional(),
-  social_platform: z.enum(["tiktok", "youtube", "instagram", "facebook"]),
+  social_platform: z.literal("tiktok"),
   registration_criteria: z.string().min(10, "Describe registration requirements"),
   scoring_criteria: z.string().min(10, "Describe scoring rules"),
   final_award: z.string().min(3, "Describe the final award"),
@@ -107,4 +113,6 @@ export const competitionSettingsValidation = z.object({
   weight_comments: z.coerce.number().min(0),
   weight_shares: z.coerce.number().min(0),
   weight_brand_mentions: z.coerce.number().min(0),
+  comment_filter_enabled: z.boolean(),
+  comment_match_terms: z.string().optional(),
 });

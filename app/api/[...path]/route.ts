@@ -8,10 +8,10 @@ async function proxyRequest(request: NextRequest, path: string[]) {
   target.search = request.nextUrl.search;
 
   const headers = new Headers();
-  const contentType = request.headers.get("content-type");
+  const requestContentType = request.headers.get("content-type");
   const authorization = request.headers.get("authorization");
 
-  if (contentType) headers.set("content-type", contentType);
+  if (requestContentType) headers.set("content-type", requestContentType);
   if (authorization) headers.set("authorization", authorization);
 
   const init: RequestInit = {
@@ -27,11 +27,18 @@ async function proxyRequest(request: NextRequest, path: string[]) {
   const upstream = await fetch(target.toString(), init);
   const responseBody = await upstream.text();
 
-  return new NextResponse(responseBody, {
+  const responseHeaders = new Headers();
+  const upstreamContentType = upstream.headers.get("content-type");
+  if (upstreamContentType) {
+    responseHeaders.set("content-type", upstreamContentType);
+  } else if (responseBody && upstream.status !== 204) {
+    responseHeaders.set("content-type", "application/json");
+  }
+
+  const hasBody = responseBody.length > 0 && upstream.status !== 204;
+  return new NextResponse(hasBody ? responseBody : null, {
     status: upstream.status,
-    headers: {
-      "content-type": upstream.headers.get("content-type") ?? "application/json",
-    },
+    headers: responseHeaders,
   });
 }
 

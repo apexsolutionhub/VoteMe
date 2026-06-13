@@ -3,7 +3,6 @@ import {
   KeyRound,
   LayoutDashboard,
   Settings2,
-  Trophy,
   User,
   UserPlus,
   Users,
@@ -18,6 +17,9 @@ export type DashboardNavItem = {
   icon: LucideIcon;
   description?: string;
 };
+
+/** Full-screen live display — not part of dashboard tab navigation. */
+export const ADMIN_LEADERBOARD_PATH = "/dashboard/leaderboard";
 
 export function getNavForRole(role: UserRole): DashboardNavItem[] {
   if (role === "admin") {
@@ -45,12 +47,6 @@ export function getNavForRole(role: UserRole): DashboardNavItem[] {
         label: "Candidates",
         icon: Users,
         description: "Roster & credentials",
-      },
-      {
-        href: "/dashboard/leaderboard",
-        label: "Leaderboard",
-        icon: Trophy,
-        description: "Admin-only live rankings",
       },
       {
         href: "/dashboard/change-password",

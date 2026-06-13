@@ -1,7 +1,8 @@
 "use client";
 
-import { DashboardPageHeader } from "@/components/dashboard/dashboard-page-header";
+import { CompetitionCriteriaManager } from "@/components/competition/competition-criteria-manager";
 import { CompetitionSettingsForm } from "@/components/competition/competition-settings-form";
+import { DashboardPageHeader } from "@/components/dashboard/dashboard-page-header";
 import { useDashboardUser } from "@/components/dashboard/dashboard-user-context";
 
 export default function CompetitionSettingsPage() {
@@ -14,10 +15,14 @@ export default function CompetitionSettingsPage() {
   return (
     <>
       <DashboardPageHeader
-        title="Competition,"
-        description="Set registration rules, scoring weights, final award, and live tracking for your SaaS workspace."
+        eyebrow="Admin"
+        title="Competition"
+        description="Configure registration rules, scoring weights, milestones, and live engagement tracking for your workspace."
       />
-      <CompetitionSettingsForm />
+      <div className="space-y-8">
+        <CompetitionSettingsForm />
+        <CompetitionCriteriaManager />
+      </div>
     </>
   );
 }

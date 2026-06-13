@@ -131,11 +131,11 @@
 
 @layer utilities {
   .glass-panel {
-    @apply border border-white/10 bg-white/[0.04] shadow-[inset_0_1px_0_0_oklch(1_0_0/6%)] backdrop-blur-2xl;
+    @apply border border-white/10 bg-white/4 shadow-[inset_0_1px_0_0_oklch(1_0_0/6%)] backdrop-blur-2xl;
   }
 
   .glass-panel-strong {
-    @apply border border-white/12 bg-white/[0.06] shadow-[0_8px_40px_-12px_oklch(0_0_0/50%),inset_0_1px_0_0_oklch(1_0_0/8%)] backdrop-blur-3xl;
+    @apply border border-white/12 bg-white/6 shadow-[0_8px_40px_-12px_oklch(0_0_0/50%),inset_0_1px_0_0_oklch(1_0_0/8%)] backdrop-blur-3xl;
   }
 
   .text-gradient-admin {
@@ -280,15 +280,110 @@
     animation: apex-pop-in 0.5s ease-out both;
   }
 
+  @keyframes lb-star-pulse {
+    0%,
+    100% {
+      opacity: 0.2;
+      transform: scale(0.6);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.2);
+    }
+  }
+
+  @keyframes lb-podium-rise {
+    0% {
+      opacity: 0;
+      transform: translateY(48px) scale(0.92);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes lb-crown-settle {
+    0% {
+      opacity: 0;
+      transform: translateY(-24px) scale(0.5) rotate(-12deg);
+    }
+    70% {
+      transform: translateY(4px) scale(1.08) rotate(4deg);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1) rotate(0deg);
+    }
+  }
+
+  @keyframes lb-profile-pop {
+    0% {
+      opacity: 0;
+      transform: scale(0.7);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes lb-brand-glow {
+    0%,
+    100% {
+      opacity: 0.5;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.06);
+    }
+  }
+
+  @keyframes lb-score-reveal {
+    0% {
+      opacity: 0;
+      transform: translateY(8px);
+      filter: blur(4px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+  }
+
+  .lb-star-pulse {
+    animation: lb-star-pulse 2.4s ease-in-out infinite;
+  }
+
+  .lb-podium-rise {
+    animation: lb-podium-rise 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .lb-crown-settle {
+    animation: lb-crown-settle 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  .lb-profile-pop {
+    animation: lb-profile-pop 0.55s ease-out both;
+  }
+
+  .lb-brand-glow {
+    animation: lb-brand-glow 3s ease-in-out infinite;
+  }
+
+  .lb-score-reveal {
+    animation: lb-score-reveal 0.7s ease-out both;
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .apex-float,
-    .apex-float-slow,
-    .apex-wiggle,
-    .apex-glow,
-    .apex-orbit,
-    .apex-twinkle,
-    .apex-shimmer,
-    .apex-pop-in {
+    .lb-star-pulse,
+    .lb-podium-rise,
+    .lb-crown-settle,
+    .lb-profile-pop,
+    .lb-brand-glow,
+    .lb-score-reveal {
       animation: none;
     }
   }

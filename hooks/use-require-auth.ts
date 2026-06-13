@@ -7,6 +7,7 @@ import { fetchMe } from "@/lib/auth-api";
 import {
   clearAuth,
   getAccessToken,
+  getStoredUser,
   updateStoredUser,
   type AuthUser,
 } from "@/lib/auth";
@@ -16,7 +17,7 @@ type UseRequireAuthOptions = {
   requirePasswordChanged?: boolean;
 };
 
-async function loadCurrentUser(): Promise<AuthUser | null> {
+async function revalidateUser(): Promise<AuthUser | null> {
   const token = getAccessToken();
   if (!token) return null;
 
@@ -40,8 +41,13 @@ export function useRequireAuth(options: UseRequireAuthOptions = {}) {
     let active = true;
 
     async function checkAuth() {
-      const currentUser = await loadCurrentUser();
+      const cachedUser = getStoredUser();
+      if (cachedUser && active) {
+        setUser(cachedUser);
+        setLoading(false);
+      }
 
+      const currentUser = await revalidateUser();
       if (!active) return;
 
       if (!currentUser) {

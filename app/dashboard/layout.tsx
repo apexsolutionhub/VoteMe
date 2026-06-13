@@ -1,9 +1,11 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { usePathname } from "next/navigation";
 
 import { DashboardBackground } from "@/components/dashboard/dashboard-background";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { ADMIN_LEADERBOARD_PATH } from "@/components/dashboard/dashboard-nav";
 import { DashboardUserProvider } from "@/components/dashboard/dashboard-user-context";
 import { PasswordChangeBanner } from "@/components/dashboard/password-change-banner";
 import { Spinner } from "@/components/ui/spinner";
@@ -11,12 +13,22 @@ import { useRequireAuth } from "@/hooks/use-require-auth";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const { user, loading } = useRequireAuth({ requirePasswordChanged: false });
+  const pathname = usePathname();
+  const isFullscreenLeaderboard = pathname === ADMIN_LEADERBOARD_PATH;
 
   if (loading || !user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <Spinner className="size-8" />
       </div>
+    );
+  }
+
+  if (isFullscreenLeaderboard) {
+    return (
+      <DashboardUserProvider user={user}>
+        <div className="relative min-h-svh bg-background">{children}</div>
+      </DashboardUserProvider>
     );
   }
 

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   Eye,
@@ -12,8 +13,10 @@ import {
   Video,
 } from "lucide-react";
 
+import { CandidateResultCard } from "@/components/candidate/candidate-result-card";
 import { CandidateAchievements } from "@/components/candidate/candidate-achievements";
-import { CandidatePerformanceCharts } from "@/components/candidate/candidate-performance-charts";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useVisiblePolling } from "@/hooks/use-visible-polling";
 import { useDashboardUser } from "@/components/dashboard/dashboard-user-context";
 import { DashboardPageHeader } from "@/components/dashboard/dashboard-page-header";
 import { DashboardSection } from "@/components/dashboard/dashboard-section";
@@ -26,6 +29,8 @@ import {
   type CandidateAnalytics,
   type CandidateStats,
 } from "@/lib/competition-api";
+import { liveTrackingIntervalMs } from "@/lib/live-tracking";
+import { syncAllCandidateVideos } from "@/lib/video-sync";
 import { cn } from "@/lib/utils";
 
 const emptyStats: CandidateStats = {
@@ -38,8 +43,23 @@ const emptyStats: CandidateStats = {
   competition_status: "draft",
   live_tracking_enabled: false,
   tracking_interval_minutes: 10,
-  tiktok_connected: false,
 };
+
+const CandidatePerformanceCharts = dynamic(
+  () =>
+    import("@/components/candidate/candidate-performance-charts").then(
+      (mod) => mod.CandidatePerformanceCharts,
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Skeleton className="h-[320px] rounded-2xl" />
+        <Skeleton className="h-[320px] rounded-2xl" />
+      </div>
+    ),
+  },
+);
 
 const emptyAnalytics: CandidateAnalytics = {
   totals: emptyStats,
@@ -50,6 +70,7 @@ const emptyAnalytics: CandidateAnalytics = {
   video_count: 0,
   unlocked_achievements: 0,
   total_achievements: 0,
+  competition_result: null,
 };
 
 export function CandidateDashboardHome() {
@@ -57,27 +78,36 @@ export function CandidateDashboardHome() {
   const displayName =
     [user.first_name, user.last_name].filter(Boolean).join(" ") || user.username;
   const [analytics, setAnalytics] = useState<CandidateAnalytics>(emptyAnalytics);
+  const analyticsRef = useRef(analytics);
 
   useEffect(() => {
-    let active = true;
+    analyticsRef.current = analytics;
+  }, [analytics]);
 
-    async function load() {
-      try {
-        const data = await fetchCandidateAnalytics();
-        if (active) setAnalytics(data);
-      } catch {
-        if (active) setAnalytics(emptyAnalytics);
+  const refreshAnalytics = useCallback(async () => {
+    try {
+      const { totals, videos } = analyticsRef.current;
+      if (totals.live_tracking_enabled && videos.length > 0) {
+        await syncAllCandidateVideos(videos.map((video) => ({ id: video.id })));
       }
+      const data = await fetchCandidateAnalytics();
+      setAnalytics(data);
+    } catch {
+      setAnalytics(emptyAnalytics);
     }
-
-    load();
-    const interval = setInterval(load, 60_000);
-
-    return () => {
-      active = false;
-      clearInterval(interval);
-    };
   }, []);
+
+  useEffect(() => {
+    void refreshAnalytics();
+  }, [refreshAnalytics]);
+
+  const pollIntervalMs = analytics.totals.live_tracking_enabled
+    ? liveTrackingIntervalMs(analytics.totals.tracking_interval_minutes)
+    : 0;
+
+  useVisiblePolling(refreshAnalytics, pollIntervalMs, {
+    enabled: pollIntervalMs > 0,
+  });
 
   const stats = analytics.totals;
 
@@ -141,6 +171,14 @@ export function CandidateDashboardHome() {
           videos={analytics.videos}
         />
 
+        {analytics.competition_result?.visible ? (
+          <CandidateResultCard
+            rank={analytics.competition_result.rank}
+            engagementScore={analytics.competition_result.engagement_score}
+            onPodium={analytics.competition_result.on_podium}
+          />
+        ) : null}
+
         {analytics.achievements.length > 0 ? (
           <CandidateAchievements
             achievements={analytics.achievements}
@@ -157,7 +195,7 @@ export function CandidateDashboardHome() {
             <QuickActionCard
               href="/dashboard/videos"
               title="Competition videos"
-              description="Connect TikTok & submit validated video links"
+              description="Paste TikTok video links to sync live metrics"
               icon={Video}
               accent="violet"
             />
@@ -216,21 +254,12 @@ export function CandidateDashboardHome() {
                 ) : null}
               </p>
             </div>
-            {!stats.tiktok_connected ? (
-              <Link
-                href="/dashboard/videos"
-                className="inline-flex shrink-0 text-sm font-medium text-violet-300 hover:text-violet-200"
-              >
-                Connect TikTok for live metrics →
-              </Link>
-            ) : (
-              <Link
+            <Link
                 href="/dashboard/videos"
                 className="inline-flex shrink-0 text-sm font-medium text-violet-300 hover:text-violet-200"
               >
                 Manage competition videos →
               </Link>
-            )}
           </div>
           <Sparkles
             aria-hidden

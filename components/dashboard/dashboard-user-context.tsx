@@ -3,6 +3,7 @@
 import {
   createContext,
   useContext,
+  useMemo,
   useState,
   type Dispatch,
   type ReactNode,
@@ -28,9 +29,10 @@ export function DashboardUserProvider({
   children: ReactNode;
 }) {
   const [user, setUser] = useState(initialUser);
+  const value = useMemo(() => ({ user, setUser }), [user]);
 
   return (
-    <DashboardUserContext.Provider value={{ user, setUser }}>
+    <DashboardUserContext.Provider value={value}>
       {children}
     </DashboardUserContext.Provider>
   );

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { clearAuth, getAccessToken, getRefreshToken, setAuth } from "@/lib/auth";
+import { clearAuth, getAccessToken, getRefreshToken } from "@/lib/auth";
 
 const defaultBaseURL =
   process.env.NEXT_PUBLIC_API_URL ??
@@ -8,6 +8,7 @@ const defaultBaseURL =
 
 const api = axios.create({
   baseURL: defaultBaseURL,
+  timeout: 20_000,
   headers: {
     "Content-Type": "application/json",
   },

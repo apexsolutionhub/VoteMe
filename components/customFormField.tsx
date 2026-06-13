@@ -96,6 +96,7 @@ type BaseProps<T extends FieldValues> = {
   dialogActionLabel?: string;
   dialogCancelLabel?: string;
   onAlertAction?: () => void;
+  onPaste?: React.ClipboardEventHandler<HTMLInputElement>;
 };
 
 type ControlledProps<T extends FieldValues> = BaseProps<T> & {
@@ -266,6 +267,7 @@ const CustomFormField = <T extends FieldValues>(
     accept,
     addPlaceholder,
     renderSkeleton,
+    onPaste,
   } = props as ControlledProps<T>;
 
   return (
@@ -316,6 +318,7 @@ const CustomFormField = <T extends FieldValues>(
                     disabled={disabled}
                     aria-invalid={hasError}
                     autoComplete={autoComplete}
+                    onPaste={onPaste}
                     value={(field.value as string | number | undefined | null) ?? ""}
                     onBlur={field.onBlur}
                     onChange={(event) => {

@@ -64,41 +64,6 @@ export async function fetchMe(): Promise<AuthUser> {
   return data;
 }
 
-export async function updateProfile(payload: {
-  first_name: string;
-  last_name: string;
-  email?: string;
-  phone_number?: string;
-}): Promise<AuthUser> {
-  const { data } = await api.patch<AuthUser>("/auth/me/", payload);
-  return data;
-}
-
-export type CandidateAccount = AuthUser;
-
-export async function fetchCandidates(): Promise<CandidateAccount[]> {
-  const { data } = await api.get<CandidateAccount[]>("/admin/candidates/");
-  return data;
-}
-
-export async function deleteCandidate(id: number): Promise<void> {
-  await api.delete(`/admin/candidates/${id}/`);
-}
-
-export async function createCandidate(payload: {
-  username: string;
-  password: string;
-  phone_number: string;
-  first_name?: string;
-  last_name?: string;
-}): Promise<CandidateAccount> {
-  const { data } = await api.post<CandidateAccount>(
-    "/admin/candidates/",
-    payload,
-  );
-  return data;
-}
-
 function parseHtmlErrorMessage(html: string): string | null {
   const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
   if (!titleMatch?.[1]) return null;
