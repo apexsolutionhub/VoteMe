@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
 import { ChevronDown, Save, Settings2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import type z from "zod";
@@ -146,6 +147,22 @@ export function CompetitionSettingsForm() {
     }
   }
 
+  async function handleGoLive(startDate: Date) {
+    if (!competition) return;
+    try {
+      const updated = await setCompetitionStatus(competition.id, "live", {
+        start_at: format(startDate, "yyyy-MM-dd"),
+      });
+      setCompetition(updated);
+      setCommentScoringApproximate(updated.comment_scoring_approximate ?? false);
+      toast.success(
+        `Competition is live — scoring starts ${format(startDate, "MMM d, yyyy")}`,
+      );
+    } catch (error) {
+      toast.error(getApiErrorMessage(error));
+    }
+  }
+
   async function handleStatusChange(status: CompetitionStatus) {
     if (!competition) return;
     try {
@@ -186,7 +203,7 @@ export function CompetitionSettingsForm() {
         metricCount={metricCount}
         syncing={syncing}
         onSync={() => void handleSync()}
-        onGoLive={() => void handleStatusChange("live")}
+        onGoLive={handleGoLive}
         onEnd={() => void handleStatusChange("ended")}
       />
 

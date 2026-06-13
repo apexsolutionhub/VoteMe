@@ -1,16 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { format, parseISO } from "date-fns";
 import {
   CircleDot,
   ExternalLink,
-  Radio,
   RefreshCw,
   Timer,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { GoLiveButton } from "@/components/competition/go-live-button";
 import { ADMIN_LEADERBOARD_PATH } from "@/components/dashboard/dashboard-nav";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Competition } from "@/lib/competition-api";
@@ -30,7 +31,7 @@ type CompetitionOverviewBarProps = {
   metricCount?: number;
   syncing?: boolean;
   onSync?: () => void;
-  onGoLive?: () => void;
+  onGoLive?: (startDate: Date) => void | Promise<void>;
   onEnd?: () => void;
 };
 
@@ -105,6 +106,14 @@ export function CompetitionOverviewBar({
             >
               {platform}
             </Badge>
+            {competition?.start_at ? (
+              <Badge
+                variant="outline"
+                className="border-white/12 bg-white/5 text-[10px] text-foreground/90"
+              >
+                Starts {format(parseISO(competition.start_at), "MMM d, yyyy")}
+              </Badge>
+            ) : null}
             {competition?.live_tracking_enabled ? (
               <Badge
                 variant="outline"
@@ -150,16 +159,15 @@ export function CompetitionOverviewBar({
             <RefreshCw className={cn("size-4", syncing && "animate-spin")} />
             Sync
           </Button>
-          <Button
-            type="button"
-            size="sm"
-            className="bg-linear-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-500 hover:to-teal-500"
-            onClick={onGoLive}
-            disabled={!competition || competition.status === "live"}
-          >
-            <Radio className="size-4" />
-            Go live
-          </Button>
+          <GoLiveButton
+            disabled={
+              !competition ||
+              !onGoLive ||
+              competition.status === "live" ||
+              competition.status === "ended"
+            }
+            onConfirm={onGoLive ?? (async () => undefined)}
+          />
           <Button
             type="button"
             variant="outline"

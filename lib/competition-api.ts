@@ -224,10 +224,15 @@ export async function updateCompetition(
 export async function setCompetitionStatus(
   competitionId: number,
   status: CompetitionStatus,
+  options?: { start_at?: string },
 ): Promise<Competition> {
   const { data } = await api.post<Competition>(
     "/organizations/competition/status/",
-    { competition_id: competitionId, status },
+    {
+      competition_id: competitionId,
+      status,
+      ...(options?.start_at ? { start_at: options.start_at } : {}),
+    },
   );
   return data;
 }
