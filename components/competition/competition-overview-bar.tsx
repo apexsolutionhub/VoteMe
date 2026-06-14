@@ -109,9 +109,15 @@ export function CompetitionOverviewBar({
             {competition?.start_at ? (
               <Badge
                 variant="outline"
-                className="border-white/12 bg-white/5 text-[10px] text-foreground/90"
+                className={cn(
+                  "text-[10px]",
+                  isLive
+                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-200"
+                    : "border-white/12 bg-white/5 text-foreground/90",
+                )}
               >
-                Starts {format(parseISO(competition.start_at), "MMM d, yyyy")}
+                {isLive ? "Started" : "Starts"}{" "}
+                {format(parseISO(competition.start_at), "MMM d, yyyy")}
               </Badge>
             ) : null}
             {competition?.live_tracking_enabled ? (

@@ -1,20 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { format, startOfDay } from "date-fns";
-import { CalendarIcon, Radio } from "lucide-react";
+import { startOfDay } from "date-fns";
+import { Radio } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
-  PopoverDescription,
-  PopoverHeader,
-  PopoverTitle,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
 
 type GoLiveButtonProps = {
   disabled?: boolean;
@@ -23,15 +20,17 @@ type GoLiveButtonProps = {
 
 export function GoLiveButton({ disabled, onConfirm }: GoLiveButtonProps) {
   const [open, setOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date>(() =>
+  const [calendarMonth, setCalendarMonth] = useState<Date>(() =>
     startOfDay(new Date()),
   );
   const [submitting, setSubmitting] = useState(false);
 
-  async function handleConfirm() {
+  async function handleSelect(date: Date | undefined) {
+    if (!date || submitting) return;
+
     setSubmitting(true);
     try {
-      await onConfirm(selectedDate);
+      await onConfirm(startOfDay(date));
       setOpen(false);
     } finally {
       setSubmitting(false);
@@ -42,9 +41,11 @@ export function GoLiveButton({ disabled, onConfirm }: GoLiveButtonProps) {
     <Popover
       open={open}
       onOpenChange={(next) => {
-        setOpen(next);
         if (next) {
-          setSelectedDate(startOfDay(new Date()));
+          setCalendarMonth(startOfDay(new Date()));
+        }
+        if (!submitting) {
+          setOpen(next);
         }
       }}
     >
@@ -52,46 +53,32 @@ export function GoLiveButton({ disabled, onConfirm }: GoLiveButtonProps) {
         <Button
           type="button"
           size="sm"
-          disabled={disabled}
-          className="bg-linear-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-500 hover:to-teal-500"
+          disabled={disabled || submitting}
+          className="gap-1.5 bg-linear-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-500/20 transition-all hover:from-emerald-500 hover:to-teal-500 hover:shadow-emerald-500/30"
         >
-          <Radio className="size-4" />
+          {submitting ? (
+            <Spinner className="size-4" />
+          ) : (
+            <Radio className="size-4" />
+          )}
           Go live
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="end">
-        <PopoverHeader className="space-y-1 border-b border-border/60 px-4 py-3">
-          <PopoverTitle className="text-base">Choose start date</PopoverTitle>
-          <PopoverDescription>
-            Set when the competition actually started. Pick a past date if you
-            are onboarding after the competition is already running — only videos
-            published on or after this day count toward scoring.
-          </PopoverDescription>
-        </PopoverHeader>
+
+      <PopoverContent align="end" sideOffset={8} className="w-auto p-0">
         <Calendar
           mode="single"
-          selected={selectedDate}
-          onSelect={(date) => date && setSelectedDate(startOfDay(date))}
-          defaultMonth={selectedDate}
+          month={calendarMonth}
+          onMonthChange={setCalendarMonth}
+          onSelect={(date) => void handleSelect(date)}
+          captionLayout="dropdown"
+          startMonth={new Date(2020, 0)}
+          endMonth={new Date(new Date().getFullYear() + 1, 11)}
+          disabled={submitting}
+          classNames={{
+            today: "rounded-md bg-accent text-accent-foreground font-semibold",
+          }}
         />
-        <div className="flex flex-col gap-2 border-t border-border/60 p-3">
-          <p className="text-center text-xs text-muted-foreground">
-            Starts{" "}
-            <span className="font-medium text-foreground">
-              {format(selectedDate, "EEEE, MMMM d, yyyy")}
-            </span>
-          </p>
-          <Button
-            type="button"
-            size="sm"
-            className="w-full bg-linear-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-500 hover:to-teal-500"
-            disabled={submitting}
-            onClick={() => void handleConfirm()}
-          >
-            <CalendarIcon className={cn("size-4", submitting && "opacity-70")} />
-            {submitting ? "Starting…" : "Confirm & go live"}
-          </Button>
-        </div>
       </PopoverContent>
     </Popover>
   );

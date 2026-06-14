@@ -27,7 +27,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   if (isFullscreenLeaderboard) {
     return (
       <DashboardUserProvider user={user}>
-        <div className="relative min-h-svh bg-background">{children}</div>
+        <div className="relative h-dvh overflow-hidden bg-background">{children}</div>
       </DashboardUserProvider>
     );
   }

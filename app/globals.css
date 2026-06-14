@@ -353,6 +353,115 @@
     }
   }
 
+  @keyframes lb-phase-enter {
+    0% {
+      opacity: 0;
+      transform: translateY(24px) scale(0.97);
+      filter: blur(10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes lb-profile-card-rise {
+    0% {
+      opacity: 0;
+      transform: translateY(40px) scale(0.9);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes lb-avatar-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  @keyframes lb-ring-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes lb-spotlight-pulse {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 0.85;
+    }
+  }
+
+  @keyframes lb-brand-reveal {
+    0% {
+      opacity: 0;
+      transform: scale(0.85);
+      filter: blur(12px);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes lb-shimmer-slide {
+    0% {
+      transform: translateX(-120%) skewX(-12deg);
+    }
+    100% {
+      transform: translateX(220%) skewX(-12deg);
+    }
+  }
+
+  @keyframes lb-profile-batch-enter {
+    0% {
+      opacity: 0;
+      transform: translateY(18px) scale(0.9);
+      filter: blur(6px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes lb-profile-batch-exit {
+    0% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-14px) scale(0.92);
+      filter: blur(6px);
+    }
+  }
+
+  .lb-profile-batch-enter {
+    animation: lb-profile-batch-enter 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .lb-profile-batch-exit {
+    animation: lb-profile-batch-exit 0.45s cubic-bezier(0.4, 0, 0.68, 0.06) both;
+  }
+
   .lb-star-pulse {
     animation: lb-star-pulse 2.4s ease-in-out infinite;
   }
@@ -377,13 +486,50 @@
     animation: lb-score-reveal 0.7s ease-out both;
   }
 
+  .lb-phase-enter {
+    animation: lb-phase-enter 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .lb-profile-card-rise {
+    animation: lb-profile-card-rise 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .lb-avatar-float {
+    animation: lb-avatar-float 5s ease-in-out infinite;
+  }
+
+  .lb-ring-spin {
+    animation: lb-ring-spin 10s linear infinite;
+  }
+
+  .lb-spotlight-pulse {
+    animation: lb-spotlight-pulse 4s ease-in-out infinite;
+  }
+
+  .lb-brand-reveal {
+    animation: lb-brand-reveal 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .lb-shimmer-slide {
+    animation: lb-shimmer-slide 3.5s ease-in-out infinite;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .lb-star-pulse,
     .lb-podium-rise,
     .lb-crown-settle,
     .lb-profile-pop,
     .lb-brand-glow,
-    .lb-score-reveal {
+    .lb-score-reveal,
+    .lb-phase-enter,
+    .lb-profile-card-rise,
+    .lb-avatar-float,
+    .lb-ring-spin,
+    .lb-spotlight-pulse,
+    .lb-brand-reveal,
+    .lb-shimmer-slide,
+    .lb-profile-batch-enter,
+    .lb-profile-batch-exit {
       animation: none;
     }
   }

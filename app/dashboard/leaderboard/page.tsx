@@ -89,7 +89,7 @@ export default function AdminLeaderboardPage() {
   }
 
   return (
-    <div className="relative min-h-svh">
+    <div className="relative h-dvh overflow-hidden">
       <Link
         href="/dashboard"
         className="fixed left-4 top-4 z-50 inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-black/40 px-3 py-1.5 text-xs font-medium text-white/80 backdrop-blur-md transition-colors hover:bg-black/55 hover:text-white sm:left-6 sm:top-6"

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
+import { format, isPast, isToday, startOfDay } from "date-fns";
 import { ChevronDown, Save, Settings2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import type z from "zod";
@@ -155,9 +155,16 @@ export function CompetitionSettingsForm() {
       });
       setCompetition(updated);
       setCommentScoringApproximate(updated.comment_scoring_approximate ?? false);
-      toast.success(
-        `Competition is live — scoring starts ${format(startDate, "MMM d, yyyy")}`,
-      );
+
+      const normalized = startOfDay(startDate);
+      const dateLabel = format(normalized, "MMM d, yyyy");
+      if (isToday(normalized)) {
+        toast.success("Competition is live — scoring starts today");
+      } else if (isPast(normalized)) {
+        toast.success(`Competition is live — scoring backdated to ${dateLabel}`);
+      } else {
+        toast.success(`Competition is live — scoring starts ${dateLabel}`);
+      }
     } catch (error) {
       toast.error(getApiErrorMessage(error));
     }

@@ -108,7 +108,7 @@ export function PublicLeaderboardClient({ orgSlug }: PublicLeaderboardClientProp
   }
 
   return (
-    <div className="relative min-h-svh">
+    <div className="relative h-dvh overflow-hidden">
       <div className="fixed left-4 top-4 z-50 flex gap-2 sm:left-6 sm:top-6">
         <Button
           asChild
